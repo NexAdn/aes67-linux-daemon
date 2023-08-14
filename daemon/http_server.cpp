@@ -83,7 +83,7 @@ bool HttpServer::init() {
     return false;
   }
 
-  svr_.set_mount_point(nullptr, config_->get_http_base_dir().c_str());
+  svr_.set_mount_point("", config_->get_http_base_dir());
 
   svr_.Get("(/|/Config|/PTP|/Sources|/Sinks|/Browser)",
            [&](const Request& req, Response& res) {
@@ -336,7 +336,7 @@ bool HttpServer::init() {
   /* start http server on a separate thread */
   res_ = std::async(std::launch::async, [&]() {
     try {
-      svr_.listen(config_->get_ip_addr_str().c_str(), config_->get_http_port());
+      svr_.listen(config_->get_ip_addr_str(), config_->get_http_port());
     } catch (...) {
       BOOST_LOG_TRIVIAL(fatal)
           << "http_server:: "
@@ -348,7 +348,7 @@ bool HttpServer::init() {
   });
 
   /* wait for HTTP server to show up */
-  httplib::Client cli(config_->get_ip_addr_str().c_str(),
+  httplib::Client cli(config_->get_ip_addr_str(),
                       config_->get_http_port());
   int retry = 3;
   while (retry) {
